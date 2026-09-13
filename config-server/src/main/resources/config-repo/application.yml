@@ -1,0 +1,4 @@
+app:
+  name: Online Medical Shop
+
+environment: development
