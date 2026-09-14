@@ -1,0 +1,141 @@
+services:
+  config-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: config-server
+    image: medical-config-server:local
+    ports:
+      - "8888:8888"
+    restart: on-failure
+
+  service-registry:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: service-registry
+    image: medical-service-registry:local
+    ports:
+      - "8761:8761"
+    restart: on-failure
+
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: gateway
+    image: medical-gateway:local
+    ports:
+      - "8081:8081"
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+      EUREKA_SERVER_URL: http://service-registry:8761/eureka/
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://host.docker.internal:8080/realms/medical-shop}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - config-server
+      - service-registry
+    restart: on-failure
+
+  auth-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: auth-service } }
+    image: medical-auth-service:local
+    environment: &spring-client-environment
+      CONFIG_SERVER_URL: http://config-server:8888
+      EUREKA_SERVER_URL: http://service-registry:8761/eureka/
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  cart-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: cart-service } }
+    image: medical-cart-service:local
+    environment: *spring-client-environment
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  delivery-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: delivery-service } }
+    image: medical-delivery-service:local
+    environment: *spring-client-environment
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  inventory-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: inventory-service } }
+    image: medical-inventory-service:local
+    environment: *spring-client-environment
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  medicine-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: medicine-service } }
+    image: medical-medicine-service:local
+    environment: *spring-client-environment
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  notification-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: notification-service } }
+    image: medical-notification-service:local
+    environment: *spring-client-environment
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  order-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: order-service } }
+    image: medical-order-service:local
+    environment: *spring-client-environment
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  payment-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: payment-service } }
+    image: medical-payment-service:local
+    environment: *spring-client-environment
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  prescription-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: prescription-service } }
+    image: medical-prescription-service:local
+    environment: *spring-client-environment
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  user-service:
+    build: { context: ., dockerfile: Dockerfile, args: { SERVICE_DIR: user-service } }
+    image: medical-user-service:local
+    ports:
+      - "8082:8082"
+    environment:
+      <<: *spring-client-environment
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://host.docker.internal:8080/realms/medical-shop}
+      KEYCLOAK_SERVER_URL: ${KEYCLOAK_SERVER_URL:-http://host.docker.internal:8080}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-medical-shop}
+      KEYCLOAK_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:-admin11111}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-Admin12345}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-medical-shop-client}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on: [config-server, service-registry]
+    restart: on-failure
+
+  chatbot-service:
+    build:
+      context: ./chatbot-service
+      dockerfile: Dockerfile
+    image: medical-chatbot-service:local
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./chatbot-service/.env
+    depends_on:
+      - user-service
+      - medicine-service
+      - inventory-service
+      - order-service
+    restart: on-failure

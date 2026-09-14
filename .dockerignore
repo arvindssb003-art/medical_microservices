@@ -1,0 +1,8 @@
+.git
+.idea
+**/target
+**/.mvn/wrapper/maven-wrapper.jar
+**/__pycache__
+**/.pytest_cache
+chatbot-service/.env
+*.log
