@@ -1,0 +1,17 @@
+server:
+  port: 8085
+
+spring:
+  datasource:
+    url: ${MEDICINE_DB_URL}
+    username: ${MEDICINE_DB_USERNAME}
+    password: ${MEDICINE_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
