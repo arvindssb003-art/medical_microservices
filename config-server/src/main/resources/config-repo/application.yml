@@ -1,4 +1,10 @@
-app:
-  name: Online Medical Shop
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
 
-environment: development
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
