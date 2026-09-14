@@ -1,4 +1,4 @@
-package com.arvind.gateway.inventory;
+package com.arvind.medical.inventory;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
