@@ -1,39 +1,73 @@
+# ================================
 # IntelliJ IDEA
+# ================================
 .idea/
 *.iml
 *.iws
 *.ipr
 
+# ================================
 # VS Code
+# ================================
 .vscode/
 
-# Maven
+# ================================
+# Java / Maven
+# ================================
 **/target/
-**/.mvn/wrapper/maven-wrapper.jar
-
-# Java
 *.class
 
+# Maven Wrapper JAR
+**/.mvn/wrapper/maven-wrapper.jar
+
+# ================================
+# Gradle
+# ================================
+**/.gradle/
+**/build/
+.gradle/
+
+# ================================
 # Logs
+# ================================
 *.log
+logs/
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Environment files
+# ================================
+# Environment / Secrets
+# ================================
 .env
+.env.*
+!.env.example
 
+# ================================
 # Python
+# ================================
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
 venv/
+env/
 
+# ================================
 # Coverage
+# ================================
 .coverage
 htmlcov/
+.coverage.*
+.pytest_cache/
 
-# Build files
-build/
+# ================================
+# OS
+# ================================
+.DS_Store
+Thumbs.db
+
+# ================================
+# Temporary files
+# ================================
+*.tmp
+*.temp
+*.swp
+*.swo
