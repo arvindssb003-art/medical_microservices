@@ -4,6 +4,7 @@ import com.arvind.user.dto.AuthResponse;
 import com.arvind.user.dto.LoginRequest;
 import com.arvind.user.dto.RegisterRequest;
 import com.arvind.user.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.arvind.user.dto.LogoutRequest;
@@ -20,7 +21,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(
-            @RequestBody RegisterRequest request) {
+            @Valid @RequestBody RegisterRequest request) {
 
         authService.register(request);
 
