@@ -1,4 +1,4 @@
-package com.arvind.gateway.cart;
+package com.arvind.cart;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
