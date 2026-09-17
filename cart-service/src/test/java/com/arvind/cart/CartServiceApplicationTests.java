@@ -1,4 +1,4 @@
-package com.arvind.gateway.cart;
+package com.arvind.cart;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
