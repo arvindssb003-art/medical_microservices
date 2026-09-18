@@ -2,6 +2,7 @@ package com.arvind.order.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,4 +15,7 @@ public class CreateOrderRequest {
     @NotEmpty(message = "Order must contain at least one item")
     @Valid
     private List<OrderItemRequest> items;
+
+    @NotBlank(message = "Payment method is required")
+    private String paymentMethod;
 }

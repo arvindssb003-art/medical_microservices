@@ -1,10 +1,8 @@
 package com.arvind.order.service;
 
-import com.arvind.order.client.CartClient;
 import com.arvind.order.client.InventoryClient;
 import com.arvind.order.client.MedicineClient;
 import com.arvind.order.client.UserClient;
-import com.arvind.order.dto.CartResponse;
 import com.arvind.order.dto.CreateOrderRequest;
 import com.arvind.order.dto.InventoryResponse;
 import com.arvind.order.dto.MedicineResponse;
@@ -14,9 +12,11 @@ import com.arvind.order.dto.OrderResponse;
 import com.arvind.order.dto.UserResponse;
 import com.arvind.order.entity.Order;
 import com.arvind.order.entity.OrderItem;
+import com.arvind.order.entity.OrderStatus;
+import com.arvind.order.event.PaymentRequestedEvent;
 import com.arvind.order.exception.InvalidOrderException;
 import com.arvind.order.exception.OrderNotFoundException;
-import com.arvind.order.repository.OrderItemRepository;
+import com.arvind.order.kafka.PaymentEventProducer;
 import com.arvind.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,12 +30,12 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
 
-    private final CartClient cartClient;
     private final InventoryClient inventoryClient;
     private final MedicineClient medicineClient;
     private final UserClient userClient;
+
+    private final PaymentEventProducer paymentEventProducer;
 
     @Override
     @Transactional
@@ -117,6 +117,17 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        PaymentRequestedEvent paymentEvent =
+                PaymentRequestedEvent.builder()
+                        .orderId(savedOrder.getId())
+                        .userId(savedOrder.getUserId())
+                        .amount(savedOrder.getTotalAmount())
+                        .currency("INR")
+                        .paymentMethod(request.getPaymentMethod())
+                        .build();
+
+        paymentEventProducer.publishPaymentRequested(paymentEvent);
+
         return buildOrderResponse(savedOrder);
     }
 
@@ -162,9 +173,7 @@ public class OrderServiceImpl implements OrderService {
                         )
                 );
 
-        order.setStatus(
-                com.arvind.order.entity.OrderStatus.CANCELLED
-        );
+        order.setStatus(OrderStatus.CANCELLED);
 
         orderRepository.save(order);
     }
