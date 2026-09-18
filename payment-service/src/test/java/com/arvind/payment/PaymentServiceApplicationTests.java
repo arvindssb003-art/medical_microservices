@@ -1,4 +1,4 @@
-package com.arvind.gateway.payment;
+package com.arvind.payment;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
