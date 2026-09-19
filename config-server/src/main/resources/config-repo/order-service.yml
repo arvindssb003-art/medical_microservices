@@ -23,15 +23,16 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+payment:
+  kafka:
+    topics:
+      requested: payment.requested
+      completed: payment.completed
+      failed: payment.failed
+
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_SERVER_URL}
     register-with-eureka: true
     fetch-registry: true
-
-
-payment:
-  kafka:
-    topics:
-      requested: payment.requested
