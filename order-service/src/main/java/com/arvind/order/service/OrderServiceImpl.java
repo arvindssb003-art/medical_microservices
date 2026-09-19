@@ -117,6 +117,9 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        savedOrder.setStatus(OrderStatus.PAYMENT_PENDING);
+        savedOrder = orderRepository.save(savedOrder);
+
         PaymentRequestedEvent paymentEvent =
                 PaymentRequestedEvent.builder()
                         .orderId(savedOrder.getId())
