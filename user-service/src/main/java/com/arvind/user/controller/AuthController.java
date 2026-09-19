@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.arvind.user.dto.LogoutRequest;
 
+import org.springframework.web.bind.annotation.PathVariable;
+import com.arvind.user.dto.UserResponse;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -41,5 +44,14 @@ public class AuthController {
         authService.logout(request);
 
         return ResponseEntity.ok("Logged out successfully");
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(
+            @PathVariable String id) {
+
+        return ResponseEntity.ok(
+                authService.getUserById(id)
+        );
     }
 }

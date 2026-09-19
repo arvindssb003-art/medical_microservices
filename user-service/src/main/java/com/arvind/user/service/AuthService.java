@@ -14,4 +14,5 @@ public interface AuthService {
     AuthResponse login(LoginRequest request);
     void logout(LogoutRequest request);
     List<UserResponse> getAllUsers();
+    UserResponse getUserById(String userId);
 }

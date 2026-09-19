@@ -180,4 +180,22 @@ public class AuthServiceImpl implements AuthService {
                 ))
                 .toList();
     }
+    @Override
+    public UserResponse getUserById(String userId) {
+
+        UserRepresentation user = keycloak
+                .realm(realm)
+                .users()
+                .get(userId)
+                .toRepresentation();
+
+        return new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                Boolean.TRUE.equals(user.isEnabled())
+        );
+    }
 }
