@@ -18,7 +18,11 @@ public class PaymentEventConsumer {
 
     @KafkaListener(
             topics = "${payment.kafka.topics.requested}",
-            groupId = "payment-service"
+            groupId = "payment-service",
+            properties = {
+                    "spring.json.value.default.type=com.arvind.payment.event.PaymentRequestedEvent",
+                    "spring.json.use.type.headers=false"
+            }
     )
     public void consumePaymentRequest(PaymentRequestedEvent event) {
 
