@@ -17,7 +17,11 @@ public class PaymentEventConsumer {
 
     @KafkaListener(
             topics = "${payment.kafka.topics.completed}",
-            groupId = "order-service"
+            groupId = "order-service",
+            properties = {
+                    "spring.json.value.default.type=com.arvind.order.event.PaymentCompletedEvent",
+                    "spring.json.use.type.headers=false"
+            }
     )
     public void consumePaymentCompleted(
             PaymentCompletedEvent event) {
@@ -37,7 +41,11 @@ public class PaymentEventConsumer {
 
     @KafkaListener(
             topics = "${payment.kafka.topics.failed}",
-            groupId = "order-service"
+            groupId = "order-service",
+            properties = {
+                    "spring.json.value.default.type=com.arvind.order.event.PaymentFailedEvent",
+                    "spring.json.use.type.headers=false"
+            }
     )
     public void consumePaymentFailed(
             PaymentFailedEvent event) {

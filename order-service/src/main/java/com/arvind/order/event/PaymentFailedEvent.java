@@ -12,4 +12,5 @@ public class PaymentFailedEvent {
     private Long orderId;
     private String userId;
     private String reason;
+    private Long paymentId;
 }
