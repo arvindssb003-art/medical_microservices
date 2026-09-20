@@ -17,6 +17,7 @@ spring:
       properties:
         spring.json.trusted.packages: com.arvind.payment.event
         spring.json.value.default.type: com.arvind.payment.event.PaymentRequestedEvent
+        spring.json.use.type.headers: false
 
 payment:
   kafka:
