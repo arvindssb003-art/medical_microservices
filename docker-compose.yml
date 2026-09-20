@@ -81,10 +81,15 @@ services:
       args:
         SERVICE_DIR: delivery-service
     image: medical-delivery-service:local
-    environment: *spring-client-environment
+    environment:
+      <<: *spring-client-environment
+      DELIVERY_DB_URL: jdbc:postgresql://postgres:5432/delivery_db
+      DELIVERY_DB_USERNAME: postgres
+      DELIVERY_DB_PASSWORD: postgres
     depends_on:
       - config-server
       - service-registry
+      - postgres
     restart: on-failure
 
   inventory-service:
