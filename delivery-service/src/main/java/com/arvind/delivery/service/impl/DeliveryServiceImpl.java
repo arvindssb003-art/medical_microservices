@@ -64,7 +64,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Transactional(readOnly = true)
     public List<DeliveryResponse> getDeliveriesByUserId(String userId) {
 
-        return deliveryRepository.findAllByUserId(userId)
+        return deliveryRepository.findByUserId(userId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
