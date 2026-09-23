@@ -16,3 +16,85 @@ spring:
             locator:
               enabled: true
               lower-case-service-id: true
+
+          routes:
+
+            # =========================
+            # AUTH SERVICE
+            # =========================
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/auth/**
+
+            # =========================
+            # USER SERVICE
+            # =========================
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/users/**
+
+            # =========================
+            # MEDICINE SERVICE
+            # =========================
+            - id: medicine-service
+              uri: lb://medicine-service
+              predicates:
+                - Path=/api/medicines/**
+
+            # =========================
+            # INVENTORY SERVICE
+            # =========================
+            - id: inventory-service
+              uri: lb://inventory-service
+              predicates:
+                - Path=/api/inventory/**
+
+            # =========================
+            # CART SERVICE
+            # =========================
+            - id: cart-service
+              uri: lb://cart-service
+              predicates:
+                - Path=/api/cart/**
+
+            # =========================
+            # ORDER SERVICE
+            # =========================
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/orders/**
+
+            # =========================
+            # PAYMENT SERVICE
+            # =========================
+            - id: payment-service
+              uri: lb://payment-service
+              predicates:
+                - Path=/api/payments/**
+
+            # =========================
+            # DELIVERY SERVICE
+            # =========================
+            - id: delivery-service
+              uri: lb://delivery-service
+              predicates:
+                - Path=/api/delivery/**
+
+            # =========================
+            # PRESCRIPTION SERVICE
+            # =========================
+            - id: prescription-service
+              uri: lb://prescription-service
+              predicates:
+                - Path=/api/prescriptions/**
+
+            # =========================
+            # NOTIFICATION SERVICE
+            # =========================
+            - id: notification-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/api/notifications/**
