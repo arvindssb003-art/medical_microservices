@@ -219,6 +219,8 @@ services:
     restart: on-failure
 
   chatbot-service:
+    profiles:
+      - chatbot
     build:
       context: ./chatbot-service
       dockerfile: Dockerfile
@@ -261,7 +263,7 @@ services:
     image: postgres:17
     container_name: medical-postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
