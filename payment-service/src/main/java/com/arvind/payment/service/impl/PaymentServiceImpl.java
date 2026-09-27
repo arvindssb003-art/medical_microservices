@@ -5,7 +5,6 @@ import com.arvind.payment.entity.Payment;
 import com.arvind.payment.entity.PaymentMethod;
 import com.arvind.payment.entity.PaymentStatus;
 import com.arvind.payment.event.PaymentRequestedEvent;
-import com.arvind.payment.exception.PaymentAlreadyExistsException;
 import com.arvind.payment.exception.PaymentNotFoundException;
 import com.arvind.payment.repository.PaymentRepository;
 import com.arvind.payment.service.PaymentService;
@@ -26,10 +25,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentResponse processPayment(PaymentRequestedEvent event) {
 
-        if (paymentRepository.existsByOrderId(event.getOrderId())) {
-            throw new PaymentAlreadyExistsException(
-                    "Payment already exists for order: " + event.getOrderId()
-            );
+        Payment existingPayment = paymentRepository
+                .findByOrderId(event.getOrderId())
+                .orElse(null);
+
+        if (existingPayment != null) {
+            return mapToResponse(existingPayment);
         }
 
         Payment payment = Payment.builder()

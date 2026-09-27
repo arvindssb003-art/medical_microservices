@@ -2,6 +2,7 @@ package com.arvind.medical.inventory.controller;
 
 import com.arvind.medical.inventory.dto.InventoryRequest;
 import com.arvind.medical.inventory.dto.InventoryResponse;
+import com.arvind.medical.inventory.dto.StockUpdateRequest;
 import com.arvind.medical.inventory.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,5 +64,18 @@ public class InventoryController {
         inventoryService.deleteInventory(medicineId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{medicineId}/decrease")
+    public ResponseEntity<InventoryResponse> decreaseStock(
+            @PathVariable Long medicineId,
+            @Valid @RequestBody StockUpdateRequest request) {
+
+        return ResponseEntity.ok(
+                inventoryService.decreaseStock(
+                        medicineId,
+                        request.getQuantity()
+                )
+        );
     }
 }

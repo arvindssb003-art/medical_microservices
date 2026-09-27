@@ -16,4 +16,6 @@ public interface InventoryService {
     InventoryResponse updateInventory(Long medicineId, InventoryRequest request);
 
     void deleteInventory(Long medicineId);
+
+    InventoryResponse decreaseStock(Long medicineId, Integer quantity);
 }

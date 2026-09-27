@@ -89,6 +89,30 @@ public class InventoryServiceImpl implements InventoryService {
         return mapToResponse(inventoryRepository.save(inventory));
     }
 
+    //For decreasing the repository
+    @Override
+    public InventoryResponse decreaseStock(Long medicineId, Integer quantity) {
+
+        Inventory inventory = inventoryRepository.findByMedicineId(medicineId)
+                .orElseThrow(() -> new InventoryNotFoundException(
+                        "Inventory not found for medicine ID: " + medicineId
+                ));
+
+        if (inventory.getAvailableQuantity() < quantity) {
+            throw new IllegalArgumentException(
+                    "Insufficient inventory for medicine ID: " + medicineId
+                            + ". Available: " + inventory.getAvailableQuantity()
+                            + ", requested: " + quantity
+            );
+        }
+
+        inventory.setAvailableQuantity(
+                inventory.getAvailableQuantity() - quantity
+        );
+
+        return mapToResponse(inventoryRepository.save(inventory));
+    }
+
     @Override
     public void deleteInventory(Long medicineId) {
 
