@@ -26,29 +26,28 @@ public class PaymentEventConsumer {
     )
     public void consumePaymentRequest(PaymentRequestedEvent event) {
 
+        PaymentResponse payment;
         try {
-            PaymentResponse payment = paymentService.processPayment(event);
-
-            PaymentCompletedEvent completedEvent = PaymentCompletedEvent.builder()
-                    .paymentId(payment.getId())
-                    .orderId(payment.getOrderId())
-                    .userId(payment.getUserId())
-                    .amount(payment.getAmount())
-                    .currency(payment.getCurrency())
-                    .transactionId(payment.getTransactionId())
-                    .build();
-
-            paymentEventProducer.publishPaymentCompleted(completedEvent);
-
+            payment = paymentService.processPayment(event);
         } catch (Exception ex) {
-
             PaymentFailedEvent failedEvent = PaymentFailedEvent.builder()
                     .orderId(event.getOrderId())
                     .userId(event.getUserId())
                     .reason(ex.getMessage())
                     .build();
-
             paymentEventProducer.publishPaymentFailed(failedEvent);
+            return;
         }
+
+        PaymentCompletedEvent completedEvent = PaymentCompletedEvent.builder()
+                .paymentId(payment.getId())
+                .orderId(payment.getOrderId())
+                .userId(payment.getUserId())
+                .amount(payment.getAmount())
+                .currency(payment.getCurrency())
+                .transactionId(payment.getTransactionId())
+                .build();
+
+        paymentEventProducer.publishPaymentCompleted(completedEvent);
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ExecutionException;
+
 @Component
 @RequiredArgsConstructor
 public class PaymentEventProducer {
@@ -20,18 +22,21 @@ public class PaymentEventProducer {
     private String paymentFailedTopic;
 
     public void publishPaymentCompleted(PaymentCompletedEvent event) {
-        kafkaTemplate.send(
-                paymentCompletedTopic,
-                event.getOrderId().toString(),
-                event
-        );
+        sendAndAwait(paymentCompletedTopic, event.getOrderId().toString(), event);
     }
 
     public void publishPaymentFailed(PaymentFailedEvent event) {
-        kafkaTemplate.send(
-                paymentFailedTopic,
-                event.getOrderId().toString(),
-                event
-        );
+        sendAndAwait(paymentFailedTopic, event.getOrderId().toString(), event);
+    }
+
+    private void sendAndAwait(String topic, String key, Object event) {
+        try {
+            kafkaTemplate.send(topic, key, event).get();
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted publishing payment event", ex);
+        } catch (ExecutionException ex) {
+            throw new IllegalStateException("Could not publish payment event to " + topic, ex.getCause());
+        }
     }
 }

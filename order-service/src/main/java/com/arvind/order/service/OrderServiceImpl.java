@@ -21,6 +21,8 @@ import com.arvind.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -129,7 +131,14 @@ public class OrderServiceImpl implements OrderService {
                         .paymentMethod(request.getPaymentMethod())
                         .build();
 
-        paymentEventProducer.publishPaymentRequested(paymentEvent);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        paymentEventProducer.publishPaymentRequested(paymentEvent);
+                    }
+                }
+        );
 
         return buildOrderResponse(savedOrder);
     }

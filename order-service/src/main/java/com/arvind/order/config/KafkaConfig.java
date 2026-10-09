@@ -1,4 +1,4 @@
-package com.arvind.payment.config;
+package com.arvind.order.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -57,7 +57,7 @@ public class KafkaConfig {
 
         properties.put(
                 ConsumerConfig.GROUP_ID_CONFIG,
-                "payment-service"
+                "order-service"
         );
 
         properties.put(
@@ -77,7 +77,7 @@ public class KafkaConfig {
 
         properties.put(
                 JsonDeserializer.TRUSTED_PACKAGES,
-                "com.arvind.payment.event"
+                "com.arvind.order.event"
         );
 
         properties.put(

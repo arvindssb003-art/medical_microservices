@@ -57,6 +57,16 @@ public class InventoryController {
         );
     }
 
+    @PatchMapping("/{medicineId}/decrease")
+    public ResponseEntity<InventoryResponse> decreaseStock(
+            @PathVariable Long medicineId,
+            @RequestBody StockUpdateRequest request) {
+
+        return ResponseEntity.ok(
+                inventoryService.decreaseStock(medicineId, request.getQuantity())
+        );
+    }
+
     @DeleteMapping("/{medicineId}")
     public ResponseEntity<Void> deleteInventory(
             @PathVariable Long medicineId) {

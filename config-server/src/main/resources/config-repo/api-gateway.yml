@@ -23,7 +23,7 @@ spring:
             # AUTH SERVICE
             # =========================
             - id: auth-service
-              uri: lb://auth-service
+              uri: lb://user-service
               predicates:
                 - Path=/api/auth/**
 
@@ -81,7 +81,7 @@ spring:
             - id: delivery-service
               uri: lb://delivery-service
               predicates:
-                - Path=/api/delivery/**
+                - Path=/api/deliveries/**
 
             # =========================
             # PRESCRIPTION SERVICE
