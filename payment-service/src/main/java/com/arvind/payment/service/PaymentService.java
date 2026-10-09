@@ -1,7 +1,6 @@
 package com.arvind.payment.service;
 
 import com.arvind.payment.dto.PaymentResponse;
-import com.arvind.payment.entity.PaymentStatus;
 import com.arvind.payment.event.PaymentRequestedEvent;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public interface PaymentService {
 
     PaymentResponse getPaymentByOrderId(Long orderId);
 
-    List<PaymentResponse> getAllPayments();
+    PaymentResponse verifyRazorpayPayment(Long orderId, String razorpayPaymentId, String razorpaySignature);
 
-    PaymentResponse updatePaymentStatus(Long paymentId, PaymentStatus status);
+    List<PaymentResponse> getAllPayments();
 }

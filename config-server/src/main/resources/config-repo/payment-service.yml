@@ -2,6 +2,12 @@ server:
   port: 8089
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/medical-shop}
+
   datasource:
     url: ${PAYMENT_DB_URL}
     username: ${PAYMENT_DB_USERNAME}
@@ -39,3 +45,7 @@ payment:
       requested: payment.requested
       completed: payment.completed
       failed: payment.failed
+
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:}
+  key-secret: ${RAZORPAY_KEY_SECRET:}

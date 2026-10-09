@@ -57,16 +57,6 @@ public class InventoryController {
         );
     }
 
-    @PatchMapping("/{medicineId}/decrease")
-    public ResponseEntity<InventoryResponse> decreaseStock(
-            @PathVariable Long medicineId,
-            @RequestBody StockUpdateRequest request) {
-
-        return ResponseEntity.ok(
-                inventoryService.decreaseStock(medicineId, request.getQuantity())
-        );
-    }
-
     @DeleteMapping("/{medicineId}")
     public ResponseEntity<Void> deleteInventory(
             @PathVariable Long medicineId) {
@@ -76,7 +66,10 @@ public class InventoryController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{medicineId}/decrease")
+    @RequestMapping(
+            value = "/{medicineId}/decrease",
+            method = {RequestMethod.POST, RequestMethod.PATCH}
+    )
     public ResponseEntity<InventoryResponse> decreaseStock(
             @PathVariable Long medicineId,
             @Valid @RequestBody StockUpdateRequest request) {

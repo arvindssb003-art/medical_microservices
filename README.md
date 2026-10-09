@@ -55,6 +55,17 @@ Spring Cloud, PostgreSQL, Keycloak and Python.
 
 ...
 
+## Razorpay Checkout
+
+Set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` before starting the services.
+The payment service creates a Razorpay order after it receives an order payment
+request. The client can poll `GET /api/payments/order/{orderId}` until the
+payment response contains `razorpayOrderId` and `razorpayKeyId`, then use those
+values with Razorpay Checkout. Post the Checkout result to
+`POST /api/payments/order/{orderId}/verify` with `razorpayPaymentId` and
+`razorpaySignature`. The service verifies the signature, confirms/captures the
+payment with Razorpay, and only then emits the payment-completed event.
+
 ## Contributors
 
 - Surjeet0114

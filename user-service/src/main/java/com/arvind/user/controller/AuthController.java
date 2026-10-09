@@ -2,6 +2,7 @@ package com.arvind.user.controller;
 
 import com.arvind.user.dto.AuthResponse;
 import com.arvind.user.dto.LoginRequest;
+import com.arvind.user.dto.RefreshTokenRequest;
 import com.arvind.user.dto.RegisterRequest;
 import com.arvind.user.service.AuthService;
 import jakarta.validation.Valid;
@@ -37,6 +38,14 @@ public class AuthController {
 
         return ResponseEntity.ok(authService.login(request));
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(
+            @Valid @RequestBody RefreshTokenRequest request) {
+
+        return ResponseEntity.ok(authService.refresh(request.refreshToken()));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<String> logout(
             @RequestBody LogoutRequest request) {

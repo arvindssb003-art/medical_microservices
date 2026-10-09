@@ -18,6 +18,4 @@ public interface InventoryService {
     InventoryResponse decreaseStock(Long medicineId, Integer quantity);
 
     void deleteInventory(Long medicineId);
-
-    InventoryResponse decreaseStock(Long medicineId, Integer quantity);
 }

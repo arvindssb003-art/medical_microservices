@@ -40,6 +40,9 @@ public class Payment {
     @Column(unique = true)
     private String transactionId;
 
+    @Column(unique = true)
+    private String razorpayOrderId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default

@@ -21,6 +21,8 @@ public class PaymentResponse {
     private String currency;
     private PaymentMethod paymentMethod;
     private String transactionId;
+    private String razorpayOrderId;
+    private String razorpayKeyId;
     private PaymentStatus status;
     private String failureReason;
     private LocalDateTime createdAt;

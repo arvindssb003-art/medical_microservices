@@ -7,6 +7,7 @@ import com.arvind.user.dto.RegisterRequest;
 import com.arvind.user.dto.UserResponse;
 import com.arvind.user.exception.UserAlreadyExistsException;
 import jakarta.ws.rs.core.Response;
+import org.springframework.core.ParameterizedTypeReference;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
@@ -22,6 +23,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -140,6 +142,46 @@ public class AuthServiceImpl implements AuthService {
             }
         }
     }
+
+    @Override
+    public AuthResponse refresh(String refreshToken) {
+        String tokenUrl = serverUrl
+                + "/realms/"
+                + realm
+                + "/protocol/openid-connect/token";
+
+        MultiValueMap<String, String> formData =
+                new LinkedMultiValueMap<>();
+        formData.add("client_id", clientId);
+        formData.add("grant_type", "refresh_token");
+        formData.add("refresh_token", refreshToken);
+
+        Map<String, Object> tokenResponse = restClient.post()
+                .uri(tokenUrl)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(formData)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {});
+
+        if (tokenResponse == null
+                || !(tokenResponse.get("access_token") instanceof String accessToken)
+                || !(tokenResponse.get("refresh_token") instanceof String newRefreshToken)) {
+            throw new IllegalStateException("Keycloak returned an incomplete token response");
+        }
+
+        return new AuthResponse(
+                accessToken,
+                newRefreshToken,
+                numberValue(tokenResponse.get("expires_in")),
+                numberValue(tokenResponse.get("refresh_expires_in")),
+                (String) tokenResponse.get("token_type")
+        );
+    }
+
+    private long numberValue(Object value) {
+        return value instanceof Number number ? number.longValue() : 0;
+    }
+
     @Override
     public void logout(LogoutRequest request) {
 

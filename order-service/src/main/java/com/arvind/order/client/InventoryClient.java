@@ -13,7 +13,7 @@ public interface InventoryClient {
             @PathVariable("medicineId") Long medicineId
     );
 
-    @PatchMapping("/api/inventory/{medicineId}/decrease")
+    @PostMapping("/api/inventory/{medicineId}/decrease")
     InventoryResponse decreaseStock(
             @PathVariable("medicineId") Long medicineId,
             @RequestBody StockUpdateRequest request

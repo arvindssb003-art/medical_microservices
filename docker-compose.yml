@@ -222,6 +222,11 @@ services:
       PAYMENT_DB_URL: jdbc:postgresql://postgres:5432/payment_db
       PAYMENT_DB_USERNAME: postgres
       PAYMENT_DB_PASSWORD: postgres
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://host.docker.internal:8080/realms/medical-shop}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       config-server:
         condition: service_healthy

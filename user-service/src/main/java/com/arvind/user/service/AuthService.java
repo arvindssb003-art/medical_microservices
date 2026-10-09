@@ -12,6 +12,9 @@ public interface AuthService {
     void register(RegisterRequest request);
 
     AuthResponse login(LoginRequest request);
+
+    AuthResponse refresh(String refreshToken);
+
     void logout(LogoutRequest request);
     List<UserResponse> getAllUsers();
     UserResponse getUserById(String userId);

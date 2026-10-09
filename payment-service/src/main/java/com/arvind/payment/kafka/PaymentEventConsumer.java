@@ -1,7 +1,5 @@
 package com.arvind.payment.kafka;
 
-import com.arvind.payment.dto.PaymentResponse;
-import com.arvind.payment.event.PaymentCompletedEvent;
 import com.arvind.payment.event.PaymentFailedEvent;
 import com.arvind.payment.event.PaymentRequestedEvent;
 import com.arvind.payment.service.PaymentService;
@@ -26,9 +24,8 @@ public class PaymentEventConsumer {
     )
     public void consumePaymentRequest(PaymentRequestedEvent event) {
 
-        PaymentResponse payment;
         try {
-            payment = paymentService.processPayment(event);
+            paymentService.processPayment(event);
         } catch (Exception ex) {
             PaymentFailedEvent failedEvent = PaymentFailedEvent.builder()
                     .orderId(event.getOrderId())
@@ -36,18 +33,6 @@ public class PaymentEventConsumer {
                     .reason(ex.getMessage())
                     .build();
             paymentEventProducer.publishPaymentFailed(failedEvent);
-            return;
         }
-
-        PaymentCompletedEvent completedEvent = PaymentCompletedEvent.builder()
-                .paymentId(payment.getId())
-                .orderId(payment.getOrderId())
-                .userId(payment.getUserId())
-                .amount(payment.getAmount())
-                .currency(payment.getCurrency())
-                .transactionId(payment.getTransactionId())
-                .build();
-
-        paymentEventProducer.publishPaymentCompleted(completedEvent);
     }
 }

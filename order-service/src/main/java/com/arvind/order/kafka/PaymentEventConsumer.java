@@ -9,12 +9,14 @@ import com.arvind.order.event.PaymentFailedEvent;
 import com.arvind.order.repository.OrderRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentEventConsumer {
 
     private final OrderRepository orderRepository;
@@ -76,10 +78,22 @@ public class PaymentEventConsumer {
             StockUpdateRequest request =
                     new StockUpdateRequest(item.getQuantity());
 
-            inventoryClient.decreaseStock(
-                    item.getMedicineId(),
-                    request
-            );
+            try {
+                inventoryClient.decreaseStock(
+                        item.getMedicineId(),
+                        request
+                );
+            } catch (RuntimeException ex) {
+                log.error(
+                        "Payment is confirmed for order {}, but inventory could not be decreased "
+                                + "for medicine {} (quantity {}). Order will still be marked paid; "
+                                + "inventory requires follow-up.",
+                        order.getId(),
+                        item.getMedicineId(),
+                        item.getQuantity(),
+                        ex
+                );
+            }
         }
 
         order.setStatus(OrderStatus.PAID);

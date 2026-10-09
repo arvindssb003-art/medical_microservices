@@ -34,6 +34,13 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(RazorpayVerificationException.class)
+    public ResponseEntity<Map<String, Object>> handleRazorpayVerification(
+            RazorpayVerificationException ex) {
+
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(
             MethodArgumentNotValidException ex) {
