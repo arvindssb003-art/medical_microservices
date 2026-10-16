@@ -32,7 +32,8 @@ public class UserController {
                 "username", jwt.getClaimAsString("preferred_username"),
                 "email", jwt.getClaimAsString("email"),
                 "firstName", jwt.getClaimAsString("given_name"),
-                "lastName", jwt.getClaimAsString("family_name")
+                "lastName", jwt.getClaimAsString("family_name"),
+                "roles", realmRoles(jwt)
         );
 
         return ResponseEntity.ok(userProfile);
@@ -51,5 +52,17 @@ public class UserController {
         return ResponseEntity.ok(
                 authService.getUserById(id)
         );
+    }
+
+    private List<String> realmRoles(Jwt jwt) {
+        Object realmAccessClaim = jwt.getClaims().get("realm_access");
+        if (!(realmAccessClaim instanceof Map<?, ?> realmAccess)
+                || !(realmAccess.get("roles") instanceof List<?> roles)) {
+            return List.of();
+        }
+        return roles.stream()
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .toList();
     }
 }

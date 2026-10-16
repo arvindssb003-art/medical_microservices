@@ -81,6 +81,22 @@ record is published to the corresponding `.DLT` topic (for example,
 after the underlying issue is resolved; the services do not currently replay
 DLT records automatically.
 
+## Role-Based Access
+
+The gateway and the user/payment services map Keycloak realm roles from
+`realm_access.roles` to Spring Security roles. Self-registration assigns the
+`CUSTOMER` realm role, so create that realm role before enabling registration.
+Existing accounts need the `CUSTOMER` role assigned in Keycloak as well.
+Customer APIs require `CUSTOMER`, while medicine/inventory reads and the listed
+authentication POST endpoints remain public. Administrative endpoints
+(catalog/inventory mutations, user administration, payment listing, and
+delivery status updates) are denied until an admin flow and its authorization
+policy are implemented. Login and token-refresh responses include a `roles`
+array from the validated Keycloak access token; `GET /api/users/profile` also
+returns the current user's realm roles so a client can display them. An account
+with `ADMIN` can authenticate and access its profile for testing, but does not
+thereby gain access to the deferred administrative endpoints.
+
 ## Contributors
 
 - Surjeet0114

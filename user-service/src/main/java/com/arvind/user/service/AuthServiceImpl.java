@@ -17,6 +17,8 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -29,6 +31,7 @@ import java.util.Map;
 public class AuthServiceImpl implements AuthService {
 
     private final Keycloak keycloak;
+    private final JwtDecoder jwtDecoder;
     private final RestClient restClient;
 
     @Value("${keycloak.server-url}")
@@ -40,9 +43,9 @@ public class AuthServiceImpl implements AuthService {
     @Value("${keycloak.client.id}")
     private String clientId;
 
-    public AuthServiceImpl(Keycloak keycloak) {
-
+    public AuthServiceImpl(Keycloak keycloak, JwtDecoder jwtDecoder) {
         this.keycloak = keycloak;
+        this.jwtDecoder = jwtDecoder;
         this.restClient = RestClient.create();
     }
 
@@ -91,10 +94,10 @@ public class AuthServiceImpl implements AuthService {
                     .get(userId)
                     .resetPassword(password);
 
-            var patientRole = keycloak
+            var customerRole = keycloak
                     .realm(realm)
                     .roles()
-                    .get("PATIENT")
+                    .get("CUSTOMER")
                     .toRepresentation();
 
             keycloak
@@ -103,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
                     .get(userId)
                     .roles()
                     .realmLevel()
-                    .add(List.of(patientRole));
+                    .add(List.of(customerRole));
 
         } finally {
             response.close();
@@ -133,7 +136,8 @@ public class AuthServiceImpl implements AuthService {
                     tokenResponse.getRefreshToken(),
                     tokenResponse.getExpiresIn(),
                     tokenResponse.getRefreshExpiresIn(),
-                    tokenResponse.getTokenType()
+                    tokenResponse.getTokenType(),
+                    getRealmRoles(tokenResponse.getToken())
             );
 
         } finally {
@@ -174,8 +178,22 @@ public class AuthServiceImpl implements AuthService {
                 newRefreshToken,
                 numberValue(tokenResponse.get("expires_in")),
                 numberValue(tokenResponse.get("refresh_expires_in")),
-                (String) tokenResponse.get("token_type")
+                (String) tokenResponse.get("token_type"),
+                getRealmRoles(accessToken)
         );
+    }
+
+    private List<String> getRealmRoles(String accessToken) {
+        Jwt jwt = jwtDecoder.decode(accessToken);
+        Object realmAccessClaim = jwt.getClaims().get("realm_access");
+        if (!(realmAccessClaim instanceof Map<?, ?> realmAccess)
+                || !(realmAccess.get("roles") instanceof List<?> roles)) {
+            return List.of();
+        }
+        return roles.stream()
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .toList();
     }
 
     private long numberValue(Object value) {

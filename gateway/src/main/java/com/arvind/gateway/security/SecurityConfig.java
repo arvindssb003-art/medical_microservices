@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,9 +30,49 @@ public class SecurityConfig {
                                 "/api/auth/refresh",
                                 "/api/auth/logout"
                         ).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/medicines/**", "/api/inventory/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/profile")
+                        .hasAnyRole("CUSTOMER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/**")
+                        .denyAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/**")
+                        .denyAll()
+                        .requestMatchers(HttpMethod.GET, "/api/payments")
+                        .denyAll()
+                        .requestMatchers(HttpMethod.POST, "/api/inventory/*/decrease")
+                        .denyAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/inventory/*/decrease")
+                        .denyAll()
+                        .requestMatchers(
+                                HttpMethod.POST, "/api/medicines/**",
+                                "/api/inventory/**"
+                        )
+                        .denyAll()
+                        .requestMatchers(
+                                HttpMethod.PUT, "/api/medicines/**",
+                                "/api/inventory/**"
+                        )
+                        .denyAll()
+                        .requestMatchers(
+                                HttpMethod.PATCH, "/api/medicines/**",
+                                "/api/inventory/**"
+                        )
+                        .denyAll()
+                        .requestMatchers(
+                                HttpMethod.DELETE, "/api/medicines/**",
+                                "/api/inventory/**"
+                        )
+                        .denyAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/deliveries/**")
+                        .denyAll()
+                        .anyRequest().hasAnyRole("CUSTOMER", "ADMIN")
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(
+                                new KeycloakJwtAuthenticationConverter()
+                        ))
+                )
                 .build();
     }
 
