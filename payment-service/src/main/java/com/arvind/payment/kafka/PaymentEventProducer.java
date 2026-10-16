@@ -4,16 +4,14 @@ import com.arvind.payment.event.PaymentCompletedEvent;
 import com.arvind.payment.event.PaymentFailedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ExecutionException;
+import com.arvind.payment.service.OutboxService;
 
 @Component
 @RequiredArgsConstructor
 public class PaymentEventProducer {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final OutboxService outboxService;
 
     @Value("${payment.kafka.topics.completed}")
     private String paymentCompletedTopic;
@@ -21,22 +19,11 @@ public class PaymentEventProducer {
     @Value("${payment.kafka.topics.failed}")
     private String paymentFailedTopic;
 
-    public void publishPaymentCompleted(PaymentCompletedEvent event) {
-        sendAndAwait(paymentCompletedTopic, event.getOrderId().toString(), event);
+    public void enqueuePaymentCompleted(PaymentCompletedEvent event) {
+        outboxService.enqueue(paymentCompletedTopic, event.getOrderId().toString(), event);
     }
 
-    public void publishPaymentFailed(PaymentFailedEvent event) {
-        sendAndAwait(paymentFailedTopic, event.getOrderId().toString(), event);
-    }
-
-    private void sendAndAwait(String topic, String key, Object event) {
-        try {
-            kafkaTemplate.send(topic, key, event).get();
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted publishing payment event", ex);
-        } catch (ExecutionException ex) {
-            throw new IllegalStateException("Could not publish payment event to " + topic, ex.getCause());
-        }
+    public void enqueuePaymentFailed(PaymentFailedEvent event) {
+        outboxService.enqueue(paymentFailedTopic, event.getOrderId().toString(), event);
     }
 }

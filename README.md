@@ -66,6 +66,21 @@ values with Razorpay Checkout. Post the Checkout result to
 `razorpaySignature`. The service verifies the signature, confirms/captures the
 payment with Razorpay, and only then emits the payment-completed event.
 
+## Kafka Failure Handling
+
+Order and payment services persist outgoing Kafka events in their own
+`outbox_events` database table in the same transaction as the related order or
+payment change. A scheduled publisher sends pending rows and retries publishing
+failures with backoff. Delivery is at-least-once: a process crash after Kafka
+accepts an event but before the database marks it published can result in a
+duplicate, so consumers must be idempotent.
+
+Consumer processing failures are retried with exponential backoff before the
+record is published to the corresponding `.DLT` topic (for example,
+`payment.requested.DLT`). DLT records require operator review and manual replay
+after the underlying issue is resolved; the services do not currently replay
+DLT records automatically.
+
 ## Contributors
 
 - Surjeet0114

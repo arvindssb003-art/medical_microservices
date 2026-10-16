@@ -2,8 +2,6 @@ package com.arvind.payment.controller;
 
 import com.arvind.payment.dto.PaymentResponse;
 import com.arvind.payment.dto.RazorpayPaymentVerificationRequest;
-import com.arvind.payment.event.PaymentCompletedEvent;
-import com.arvind.payment.kafka.PaymentEventProducer;
 import com.arvind.payment.service.PaymentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -21,7 +19,6 @@ import java.util.List;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final PaymentEventProducer paymentEventProducer;
 
     @GetMapping("/{paymentId}")
     public ResponseEntity<PaymentResponse> getPaymentById(
@@ -53,22 +50,11 @@ public class PaymentController {
             @RequestBody @Valid
             RazorpayPaymentVerificationRequest request) {
 
-        PaymentResponse payment = paymentService.verifyRazorpayPayment(
+        return ResponseEntity.ok(paymentService.verifyRazorpayPayment(
                 orderId,
                 request.getRazorpayPaymentId(),
                 request.getRazorpaySignature()
-        );
-
-        paymentEventProducer.publishPaymentCompleted(PaymentCompletedEvent.builder()
-                .paymentId(payment.getId())
-                .orderId(payment.getOrderId())
-                .userId(payment.getUserId())
-                .amount(payment.getAmount())
-                .currency(payment.getCurrency())
-                .transactionId(payment.getTransactionId())
-                .build());
-
-        return ResponseEntity.ok(payment);
+        ));
     }
 
     @GetMapping

@@ -5,9 +5,11 @@ import com.arvind.payment.entity.Payment;
 import com.arvind.payment.entity.PaymentMethod;
 import com.arvind.payment.entity.PaymentStatus;
 import com.arvind.payment.event.PaymentRequestedEvent;
+import com.arvind.payment.event.PaymentCompletedEvent;
 import com.arvind.payment.exception.PaymentNotFoundException;
 import com.arvind.payment.exception.RazorpayVerificationException;
 import com.arvind.payment.gateway.RazorpayGateway;
+import com.arvind.payment.kafka.PaymentEventProducer;
 import com.arvind.payment.repository.PaymentRepository;
 import com.arvind.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final RazorpayGateway razorpayGateway;
+    private final PaymentEventProducer paymentEventProducer;
 
     @Override
     @Transactional
@@ -131,7 +134,17 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setTransactionId(razorpayPaymentId);
         payment.setStatus(PaymentStatus.SUCCESS);
 
-        return mapToResponse(paymentRepository.save(payment));
+        Payment savedPayment = paymentRepository.save(payment);
+        paymentEventProducer.enqueuePaymentCompleted(PaymentCompletedEvent.builder()
+                .paymentId(savedPayment.getId())
+                .orderId(savedPayment.getOrderId())
+                .userId(savedPayment.getUserId())
+                .amount(savedPayment.getAmount())
+                .currency(savedPayment.getCurrency())
+                .transactionId(savedPayment.getTransactionId())
+                .build());
+
+        return mapToResponse(savedPayment);
     }
 
     @Override
