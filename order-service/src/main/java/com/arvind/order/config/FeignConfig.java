@@ -17,14 +17,11 @@ public class FeignConfig {
 
         return requestTemplate -> {
 
-            log.info("========== FEIGN INTERCEPTOR ==========");
-
             ServletRequestAttributes attributes =
                     (ServletRequestAttributes)
                             RequestContextHolder.getRequestAttributes();
 
             if (attributes == null) {
-                log.warn("No servlet request context available");
                 return;
             }
 
@@ -34,31 +31,10 @@ public class FeignConfig {
             String authorization =
                     request.getHeader("Authorization");
 
-            boolean hasAuthorization =
-                    authorization != null
-                            && !authorization.isBlank();
-
-            log.info(
-                    "Authorization header present: {}, token starts with Bearer: {}",
-                    hasAuthorization,
-                    hasAuthorization && authorization.startsWith("Bearer ")
-            );
-
-            if (hasAuthorization) {
-
+            if (authorization != null && !authorization.isBlank()) {
                 requestTemplate.header(
                         "Authorization",
                         authorization
-                );
-
-                log.info(
-                        "Authorization header forwarded to {}",
-                        requestTemplate.url()
-                );
-            } else {
-                log.warn(
-                        "Authorization header NOT forwarded to {}",
-                        requestTemplate.url()
                 );
             }
         };

@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,37 +22,40 @@ public class DeliveryController {
 
     @PostMapping
     public ResponseEntity<DeliveryResponse> createDelivery(
+            @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody DeliveryRequest request) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(deliveryService.createDelivery(request));
+                .body(deliveryService.createDelivery(request, jwt.getSubject()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DeliveryResponse> getDeliveryById(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long id) {
 
         return ResponseEntity.ok(
-                deliveryService.getDeliveryById(id)
+                deliveryService.getDeliveryById(id, jwt.getSubject())
         );
     }
 
     @GetMapping("/order/{orderId}")
     public ResponseEntity<DeliveryResponse> getDeliveryByOrderId(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long orderId) {
 
         return ResponseEntity.ok(
-                deliveryService.getDeliveryByOrderId(orderId)
+                deliveryService.getDeliveryByOrderId(orderId, jwt.getSubject())
         );
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/me")
     public ResponseEntity<List<DeliveryResponse>> getDeliveriesByUserId(
-            @PathVariable String userId) {
+            @AuthenticationPrincipal Jwt jwt) {
 
         return ResponseEntity.ok(
-                deliveryService.getDeliveriesByUserId(userId)
+                deliveryService.getDeliveriesByUserId(jwt.getSubject())
         );
     }
 

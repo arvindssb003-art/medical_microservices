@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface DeliveryService {
 
-    DeliveryResponse createDelivery(DeliveryRequest request);
+    DeliveryResponse createDelivery(DeliveryRequest request, String userId);
 
-    DeliveryResponse getDeliveryById(Long id);
+    DeliveryResponse getDeliveryById(Long id, String userId);
 
-    DeliveryResponse getDeliveryByOrderId(Long orderId);
+    DeliveryResponse getDeliveryByOrderId(Long orderId, String userId);
 
     List<DeliveryResponse> getDeliveriesByUserId(String userId);
 

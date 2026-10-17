@@ -1,5 +1,6 @@
 package com.arvind.delivery.service.impl;
 
+import com.arvind.delivery.client.OrderClient;
 import com.arvind.delivery.dto.DeliveryRequest;
 import com.arvind.delivery.dto.DeliveryResponse;
 import com.arvind.delivery.entity.Delivery;
@@ -17,14 +18,16 @@ import java.util.List;
 public class DeliveryServiceImpl implements DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
+    private final OrderClient orderClient;
 
     @Override
     @Transactional
-    public DeliveryResponse createDelivery(DeliveryRequest request) {
+    public DeliveryResponse createDelivery(DeliveryRequest request, String userId) {
+        orderClient.verifyCustomerOwnsOrder(request.orderId());
 
         Delivery delivery = Delivery.builder()
                 .orderId(request.orderId())
-                .userId(request.userId())
+                .userId(userId)
                 .address(request.address())
                 .status("PENDING")
                 .build();
@@ -34,9 +37,9 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Override
     @Transactional(readOnly = true)
-    public DeliveryResponse getDeliveryById(Long id) {
+    public DeliveryResponse getDeliveryById(Long id, String userId) {
 
-        Delivery delivery = deliveryRepository.findById(id)
+        Delivery delivery = deliveryRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() ->
                         new DeliveryNotFoundException(
                                 "Delivery not found: " + id
@@ -48,9 +51,9 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Override
     @Transactional(readOnly = true)
-    public DeliveryResponse getDeliveryByOrderId(Long orderId) {
+    public DeliveryResponse getDeliveryByOrderId(Long orderId, String userId) {
 
-        Delivery delivery = deliveryRepository.findByOrderId(orderId)
+        Delivery delivery = deliveryRepository.findByOrderIdAndUserId(orderId, userId)
                 .orElseThrow(() ->
                         new DeliveryNotFoundException(
                                 "Delivery not found for order: " + orderId

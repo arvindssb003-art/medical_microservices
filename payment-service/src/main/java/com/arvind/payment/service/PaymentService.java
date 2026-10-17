@@ -9,11 +9,16 @@ public interface PaymentService {
 
     PaymentResponse processPayment(PaymentRequestedEvent event);
 
-    PaymentResponse getPaymentById(Long paymentId);
+    PaymentResponse getPaymentById(Long paymentId, String userId);
 
-    PaymentResponse getPaymentByOrderId(Long orderId);
+    PaymentResponse getPaymentByOrderId(Long orderId, String userId);
 
-    PaymentResponse verifyRazorpayPayment(Long orderId, String razorpayPaymentId, String razorpaySignature);
+    PaymentResponse verifyRazorpayPayment(
+            Long orderId,
+            String userId,
+            String razorpayPaymentId,
+            String razorpaySignature
+    );
 
     List<PaymentResponse> getAllPayments();
 }

@@ -10,5 +10,9 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
 
     Optional<Delivery> findByOrderId(Long orderId);
 
+    Optional<Delivery> findByIdAndUserId(Long id, String userId);
+
+    Optional<Delivery> findByOrderIdAndUserId(Long orderId, String userId);
+
     List<Delivery> findByUserId(String userId);
 }

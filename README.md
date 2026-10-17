@@ -83,7 +83,7 @@ DLT records automatically.
 
 ## Role-Based Access
 
-The gateway and the user/payment services map Keycloak realm roles from
+The gateway and secured services map Keycloak realm roles from
 `realm_access.roles` to Spring Security roles. Self-registration assigns the
 `CUSTOMER` realm role, so create that realm role before enabling registration.
 Existing accounts need the `CUSTOMER` role assigned in Keycloak as well.
@@ -96,6 +96,11 @@ array from the validated Keycloak access token; `GET /api/users/profile` also
 returns the current user's realm roles so a client can display them. An account
 with `ADMIN` can authenticate and access its profile for testing, but does not
 thereby gain access to the deferred administrative endpoints.
+
+Customer cart operations use `/api/cart/me`; order and payment ownership is
+derived from the access token subject, not a caller-supplied user ID. Delivery
+reads are scoped to the authenticated customer, and creating a delivery first
+checks that the supplied order belongs to that customer.
 
 ## Contributors
 

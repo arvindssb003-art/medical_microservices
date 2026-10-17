@@ -4,6 +4,7 @@ import com.arvind.user.dto.UserResponse;
 import com.arvind.user.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +48,11 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(
-            @PathVariable String id) {
+            @PathVariable String id,
+            @AuthenticationPrincipal Jwt jwt) {
+        if (!id.equals(jwt.getSubject())) {
+            throw new AccessDeniedException("Users may only access their own profile");
+        }
 
         return ResponseEntity.ok(
                 authService.getUserById(id)

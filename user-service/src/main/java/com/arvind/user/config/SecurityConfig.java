@@ -27,6 +27,8 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/api/users/profile").hasAnyRole("CUSTOMER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}")
+                        .hasRole("CUSTOMER")
                         .requestMatchers("/api/users/**", "/api/auth/**").denyAll()
                         .anyRequest().hasAnyRole("CUSTOMER", "ADMIN")
                 )

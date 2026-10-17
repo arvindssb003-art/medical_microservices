@@ -40,6 +40,8 @@ public class SecurityConfig {
                         .denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/payments")
                         .denyAll()
+                        .requestMatchers("/api/cart/**", "/api/orders/**")
+                        .hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.POST, "/api/inventory/*/decrease")
                         .denyAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/inventory/*/decrease")

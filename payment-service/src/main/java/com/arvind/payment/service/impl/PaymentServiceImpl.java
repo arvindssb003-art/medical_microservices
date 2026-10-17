@@ -65,9 +65,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResponse getPaymentById(Long paymentId) {
+    public PaymentResponse getPaymentById(Long paymentId, String userId) {
 
-        Payment payment = paymentRepository.findById(paymentId)
+        Payment payment = paymentRepository.findByIdAndUserId(paymentId, userId)
                 .orElseThrow(() ->
                         new PaymentNotFoundException(
                                 "Payment not found with id: " + paymentId
@@ -78,9 +78,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResponse getPaymentByOrderId(Long orderId) {
+    public PaymentResponse getPaymentByOrderId(Long orderId, String userId) {
 
-        Payment payment = paymentRepository.findByOrderId(orderId)
+        Payment payment = paymentRepository.findByOrderIdAndUserId(orderId, userId)
                 .orElseThrow(() ->
                         new PaymentNotFoundException(
                                 "Payment not found for order: " + orderId
@@ -94,10 +94,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentResponse verifyRazorpayPayment(
             Long orderId,
+            String userId,
             String razorpayPaymentId,
             String razorpaySignature) {
 
-        Payment payment = paymentRepository.findByOrderId(orderId)
+        Payment payment = paymentRepository.findByOrderIdAndUserId(orderId, userId)
                 .orElseThrow(() ->
                         new PaymentNotFoundException(
                                 "Payment not found for order: " + orderId

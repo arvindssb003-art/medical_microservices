@@ -97,6 +97,9 @@ services:
       CART_DB_URL: jdbc:postgresql://postgres:5432/cart_db
       CART_DB_USERNAME: postgres
       CART_DB_PASSWORD: postgres
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://host.docker.internal:8080/realms/medical-shop}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       config-server:
         condition: service_healthy
@@ -118,6 +121,9 @@ services:
       DELIVERY_DB_URL: jdbc:postgresql://postgres:5432/delivery_db
       DELIVERY_DB_USERNAME: postgres
       DELIVERY_DB_PASSWORD: postgres
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://host.docker.internal:8080/realms/medical-shop}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       config-server:
         condition: service_healthy
@@ -198,6 +204,9 @@ services:
       ORDER_DB_URL: jdbc:postgresql://postgres:5432/order_db
       ORDER_DB_USERNAME: postgres
       ORDER_DB_PASSWORD: postgres
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://host.docker.internal:8080/realms/medical-shop}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       config-server:
         condition: service_healthy

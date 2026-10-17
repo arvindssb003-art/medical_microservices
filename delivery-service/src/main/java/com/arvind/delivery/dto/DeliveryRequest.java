@@ -9,9 +9,6 @@ public record DeliveryRequest(
         Long orderId,
 
         @NotBlank
-        String userId,
-
-        @NotBlank
         String address
 ) {
 }
