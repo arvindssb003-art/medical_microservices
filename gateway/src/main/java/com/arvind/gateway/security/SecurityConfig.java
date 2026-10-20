@@ -50,22 +50,22 @@ public class SecurityConfig {
                                 HttpMethod.POST, "/api/medicines/**",
                                 "/api/inventory/**"
                         )
-                        .denyAll()
+                        .hasRole("ADMIN")
                         .requestMatchers(
                                 HttpMethod.PUT, "/api/medicines/**",
                                 "/api/inventory/**"
                         )
-                        .denyAll()
+                        .hasRole("ADMIN")
                         .requestMatchers(
                                 HttpMethod.PATCH, "/api/medicines/**",
                                 "/api/inventory/**"
                         )
-                        .denyAll()
+                        .hasRole("ADMIN")
                         .requestMatchers(
                                 HttpMethod.DELETE, "/api/medicines/**",
                                 "/api/inventory/**"
                         )
-                        .denyAll()
+                        .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/deliveries/**")
                         .denyAll()
                         .anyRequest().hasAnyRole("CUSTOMER", "ADMIN")

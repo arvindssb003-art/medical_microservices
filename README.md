@@ -87,20 +87,75 @@ The gateway and secured services map Keycloak realm roles from
 `realm_access.roles` to Spring Security roles. Self-registration assigns the
 `CUSTOMER` realm role, so create that realm role before enabling registration.
 Existing accounts need the `CUSTOMER` role assigned in Keycloak as well.
+Create and assign the `ADMIN` realm role only to trusted operator accounts.
 Customer APIs require `CUSTOMER`, while medicine/inventory reads and the listed
-authentication POST endpoints remain public. Administrative endpoints
-(catalog/inventory mutations, user administration, payment listing, and
-delivery status updates) are denied until an admin flow and its authorization
-policy are implemented. Login and token-refresh responses include a `roles`
-array from the validated Keycloak access token; `GET /api/users/profile` also
-returns the current user's realm roles so a client can display them. An account
-with `ADMIN` can authenticate and access its profile for testing, but does not
-thereby gain access to the deferred administrative endpoints.
+authentication POST endpoints remain public. Medicine and inventory writes
+through the gateway require `ADMIN`; inventory stock-decrease routes remain
+reserved for the order flow. User administration, payment listing, and
+delivery status updates remain denied pending their own admin policies. Login
+and token-refresh responses include a `roles` array from the validated
+Keycloak access token; `GET /api/users/profile` also returns the current user's
+realm roles so a client can display them.
+
+The medicine admin API supports single create/update and initial inventory
+creation using the existing `/api/medicines` and `/api/inventory` endpoints.
+Bulk import uses `POST /api/medicines/import/preview` with multipart field
+`file`, followed by `POST /api/medicines/import/{importId}/commit`. Imports
+accept CSV, XLS, and XLSX files with the headers in the UI's downloadable CSV
+template. Preview reports row-level validation errors; commit rejects any
+preview containing invalid rows and creates the medicine and inventory records
+for valid imports. Image upload is not implemented yet and is optional in the
+UI.
 
 Customer cart operations use `/api/cart/me`; order and payment ownership is
 derived from the access token subject, not a caller-supplied user ID. Delivery
 reads are scoped to the authenticated customer, and creating a delivery first
 checks that the supplied order belongs to that customer.
+
+## Production Compose Profile
+
+The production deployment layer is opt-in and leaves the local
+`docker-compose.yml` unchanged. Copy `production.env.example` to
+`.env.production`, replace every placeholder, and provide the values through
+your deployment platform's secret store rather than committing real
+credentials. The production overlay requires Docker Compose v2.24 or newer.
+
+Validate the merged configuration before starting it:
+
+```sh
+docker compose -p medical-production \
+  --env-file .env.production \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  config --quiet
+```
+
+Build and start the production stack with:
+
+```sh
+docker compose -p medical-production \
+  --env-file .env.production \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  up -d --build
+```
+
+The production project name and container names keep its containers and named
+volumes separate from the local stack. The overlay binds only the gateway to
+the host (loopback by default) and removes published ports for PostgreSQL,
+Kafka, the config server, service registry, and user service. Put a TLS
+reverse proxy or load balancer in front of the gateway. Set
+`GATEWAY_BIND_ADDRESS` only when the chosen ingress needs a different host
+interface.
+
+Keycloak remains external to this first backend deployment profile. Its
+public HTTPS issuer must be identical to the `iss` claim in issued tokens and
+reachable from the gateway and secured services. The profile currently runs
+PostgreSQL and Kafka as single-node Compose services and uses one application
+database role across schemas; it is a deployment starting point, not a
+high-availability production architecture. Prefer managed PostgreSQL/Kafka,
+per-service database credentials, Docker/platform secrets, backups, monitoring,
+and a documented recovery process before handling production traffic.
 
 ## Contributors
 

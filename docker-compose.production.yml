@@ -1,0 +1,122 @@
+name: medical-production
+
+services:
+  config-server:
+    image: medical-config-server:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    ports: !reset []
+    restart: unless-stopped
+
+  service-registry:
+    image: medical-service-registry:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    ports: !reset []
+    restart: unless-stopped
+
+  gateway:
+    image: medical-gateway:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    ports: !override
+      - "${GATEWAY_BIND_ADDRESS:-127.0.0.1}:${GATEWAY_PUBLIC_PORT:-8081}:8081"
+    environment:
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?Set the exact HTTPS issuer URL from production Keycloak}
+    extra_hosts: !reset []
+    restart: unless-stopped
+
+  auth-service:
+    image: medical-auth-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    environment:
+      AUTH_DB_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER}
+      AUTH_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    restart: unless-stopped
+
+  cart-service:
+    image: medical-cart-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    environment:
+      CART_DB_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER}
+      CART_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?Set the exact HTTPS issuer URL from production Keycloak}
+    extra_hosts: !reset []
+    restart: unless-stopped
+
+  delivery-service:
+    image: medical-delivery-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    environment:
+      DELIVERY_DB_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER}
+      DELIVERY_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?Set the exact HTTPS issuer URL from production Keycloak}
+    extra_hosts: !reset []
+    restart: unless-stopped
+
+  inventory-service:
+    image: medical-inventory-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    environment:
+      INVENTORY_DB_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER}
+      INVENTORY_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    restart: unless-stopped
+
+  medicine-service:
+    image: medical-medicine-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    environment:
+      MEDICINE_DB_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER}
+      MEDICINE_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    restart: unless-stopped
+
+  notification-service:
+    image: medical-notification-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    restart: unless-stopped
+
+  order-service:
+    image: medical-order-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    environment:
+      ORDER_DB_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER}
+      ORDER_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?Set the exact HTTPS issuer URL from production Keycloak}
+    extra_hosts: !reset []
+    restart: unless-stopped
+
+  payment-service:
+    image: medical-payment-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    environment:
+      PAYMENT_DB_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER}
+      PAYMENT_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?Set the exact HTTPS issuer URL from production Keycloak}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:?Set the production Razorpay key ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:?Set the production Razorpay secret}
+    extra_hosts: !reset []
+    restart: unless-stopped
+
+  prescription-service:
+    image: medical-prescription-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    environment:
+      PRESCRIPTION_DB_USERNAME: ${POSTGRES_USER:?Set POSTGRES_USER}
+      PRESCRIPTION_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    restart: unless-stopped
+
+  user-service:
+    image: medical-user-service:${IMAGE_TAG:?Set IMAGE_TAG for the production build}
+    ports: !reset []
+    environment:
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?Set the exact HTTPS issuer URL from production Keycloak}
+      KEYCLOAK_SERVER_URL: ${KEYCLOAK_SERVER_URL:?Set the production Keycloak base URL}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:?Set KEYCLOAK_REALM}
+      KEYCLOAK_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:?Set the production Keycloak admin username}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set the production Keycloak admin password}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:?Set KEYCLOAK_CLIENT_ID}
+    extra_hosts: !reset []
+    restart: unless-stopped
+
+  kafka:
+    container_name: medical-production-kafka
+    ports: !reset []
+    environment:
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    restart: unless-stopped
+
+  postgres:
+    container_name: medical-production-postgres
+    ports: !reset []
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    restart: unless-stopped
